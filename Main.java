@@ -1,13 +1,15 @@
-package t9.parte2;
-
-
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
 
 	public static void main(String[] args) {
 		ListaCliente lista = new ListaCliente();
+		
+		HashMap<String, LeitorClientes> listaArquivos = new HashMap<String, LeitorClientes>();
 
 		Scanner scanner = new Scanner(System.in);
 		String comando;
@@ -76,6 +78,47 @@ public class Main {
 
 				break;
 
+			} else if (comando.equals("addFile")) { 
+				// adiciona nome de arquivo para posterior abertura
+				String nomeArquivo = scanner.nextLine();
+				listaArquivos.put(nomeArquivo, new LeitorClientes(nomeArquivo));
+			} else  if (comando.equals("openFile")) {
+				// abre arquivo - se arquivo não foi adicionado, não faz nada
+				String nomeArquivo = scanner.nextLine();
+				if (listaArquivos.containsKey(nomeArquivo)) {
+					LeitorClientes leitor = listaArquivos.get(nomeArquivo);
+					try {
+						leitor.abreArquivo();
+					} catch (FileNotFoundException e) {
+						System.out.println("Arquivo nao existe: "+nomeArquivo);
+					}
+				}
+				
+			} else  if (comando.equals("readFile")) {
+				// lê todo o arquivo e carrega em lista
+				String nomeArquivo = scanner.nextLine();
+				if (listaArquivos.containsKey(nomeArquivo)) {
+					LeitorClientes leitor = listaArquivos.get(nomeArquivo);
+					
+					while (leitor.haMaisClientes()) {
+						Cliente cliente;
+						try {
+							cliente = leitor.proximoCliente();
+							lista.add(cliente);
+							System.out.println("Cliente adicionado: " + cliente.getNome());
+						} catch (IOException e) {
+							System.out.println(e.getMessage());
+						}
+					}
+				}
+				
+			} else  if (comando.equals("closeFile")) {
+				// fecha arquivo
+				String nomeArquivo = scanner.nextLine();
+				if (listaArquivos.containsKey(nomeArquivo)) {
+					LeitorClientes leitor = listaArquivos.get(nomeArquivo);
+					leitor.fechaArquivo();
+				}
 			}
 
 		} while (true);
