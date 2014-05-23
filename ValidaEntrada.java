@@ -1,4 +1,4 @@
-package t9.parte2;
+
 
 
 public class ValidaEntrada {
